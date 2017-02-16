@@ -53,6 +53,13 @@ def new_event():
 
 def new_sale():
     '''Get info from user, add new Sale'''
+    #show list of merch items for user reference (they probably haven't memorized merch ID #'s)
+    merch_list = merch_orm.merch_list()
+    ui.show_list(merch_list)
+    #show list of events for user reference (they probably haven't memorized event ID #'s)
+    event_list = merch_orm.event_list()
+    ui.show_event_list(event_list)
+
     new_sale = ui.get_new_sale_info()
     merch_orm.add_object_to_db('Sale',new_sale)
 
@@ -87,6 +94,7 @@ def quit():
 def main():
 
     #setup DB
+    merch_orm.setup()
 
     quit = 'q'
     choice = None

@@ -1,4 +1,8 @@
+import merch_orm, choiceManager
+from sales import Sale
 from merch import Merch
+import merch
+from events import Event
 
 def display_menu_get_choice():
 
@@ -25,12 +29,12 @@ def show_list(merchItems):
         print ('* No Items in DB *')
         return
 
-    merchItems.sort(key = lambda merch: merch.description) #this sorts the merch items by description(type)
+    merchItems.sort(key = lambda merch: merch.id) #this sorts the merch items by description(type)
 
     for merch in merchItems:
         print(merch)
 
-    print('* {} merch item(s) *'.format(len(merchItems))
+    print('* {} merch item(s) *'.format(len(merchItems)))
 
 def show_event_list(eventList):
     '''Format and display list of Events'''
@@ -39,10 +43,12 @@ def show_event_list(eventList):
         print('* No Events in DB *')
         return
 
+    #eventList.sort(key = lambda event: event.id) #this sorts the merch items by description(type)
+
     for event in eventList:
         print(event)
 
-    print('* {} event(s) *').format(len(eventList))
+    print('* {} event(s) *'.format(len(eventList)))
 
 def get_new_merch_info():
     '''Get Description and Price of Merch Item from user'''
@@ -50,7 +56,7 @@ def get_new_merch_info():
     description = input('Enter Item Description: ')
     price = input('Enter Item Price: ')
 
-    return Merch(description,price)
+    return (description,price)
 
 def get_new_event_info():
     '''Get Venue, Day, Month & Year of New Event from user'''
@@ -60,7 +66,7 @@ def get_new_event_info():
     day = input('Enter day (DD): ')
     year = input('Enter year (YYYY): ')
 
-    return Event(venue,month,day,year)
+    return (venue,month,day,year)
 
 def get_new_sale_info():
 
@@ -68,7 +74,7 @@ def get_new_sale_info():
     numSold = input('Enter number of items sold: ')
     eventID = input('Enter EventID where item was sold: ')
 
-    return Sale(numSold,merchID,eventID)
+    return (merchID,numSold,eventID)
 
 def get_id():
 

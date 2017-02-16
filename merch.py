@@ -2,9 +2,9 @@ from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from sales import Sale
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+import sales
 
 from base import Base #All of the mapped classes will use this Base
 
@@ -25,7 +25,7 @@ class Merch(Base):
     #Columms: ID, Type, Price
     #These attributes will be column names, and have the types specified
 
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key=True)
     description = Column(String)
     price = Column(Float)
 

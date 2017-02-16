@@ -15,10 +15,10 @@ class Event(Base):
     year = Column(Integer)
 
 
-def __repr__(self):
+    def __repr__(self):
 
-    return 'Event ID: {} Venue: {} Date: {}/{}/{}'.format(self.id, self.venue, self.month, self.day, self.year)
+        return 'Event ID: {} Venue: {} Date: {}-{}-{}'.format(self.id, self.venue, self.month, self.day, self.year)
 
-# #updates the db schema to enforce foreign key constraints
-# engine = create_engine('sqlite:///merchManager.db', echo=False)
-# Base.metadata.create_all(engine)
+#updates the db schema to enforce foreign key constraints
+engine = create_engine('sqlite:///merchManager.db', echo=False)
+Base.metadata.create_all(engine)
