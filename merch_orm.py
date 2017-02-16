@@ -1,0 +1,184 @@
+'''ORM = Object-relational mapping
+
+Define the fields of your objects; which maps to the structure of rows in your database
+- Can request a list of objects (DB is queried & object/list of objects is returned)
+- Can create an object, and it can be saved to DB
+- Can manipulate objects, and updates are saved to DB'''
+from sqlalchemy import create_engine
+from sqlalchemy import exc
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import sessionmaker
+from base import Base
+from sales import Sale
+from events import Event
+from merch import Merch
+import ui
+
+#Engine represents the core interface to the database
+
+#The first argument is the url of the database;
+#this points to a sqlitedb saved in a file called phone.db
+#echo=True turns on SQLAlchemy logging for debugging
+
+engine = create_engine('sqlite:///merchManager.db', echo = True)
+
+Base = declarative_base() #All of the mapped classes inherit from this class
+Base.metadata.create_all(engine) #Create a table for all the classes that use Base
+
+'''Need a session to talk to the database'''
+#A session manages mappings of objects to rows in the database
+#Make a session class -- only need to do this one time
+Session = sessionmaker(bind=engine) #using the engine created earlier
+
+
+def setup():
+    #Ask the session to instantiate a session object
+    #Use the session object to talk to DB
+    save_session = Session()
+
+    #Create a merch object; use named args to set values of the object
+    item1 = Merch(description = 'Band shirt', price = 20)
+    item2 = Merch(description = 'Band CD', price = 10)
+    item3 = Merch(description = 'Sticker/Pin', price = 5)
+
+    for merch in [item1, item2, item3, item4]:
+        #if it doesn't already exist
+        if not (getItem(merch.description)):
+        #Add merch object to session -- this tells the session that you want to map
+        # the merch object to a row in the DB
+        save_session.add(merch)
+        # The merch is pending - not yet saved
+        # Doesn't save to DB until session is committed, or closed
+
+    # Commit to save changes
+    save_session.commit() #now merch should be saved in DB
+    save_session.close()
+
+def merch_list():
+
+    '''Search Function'''
+    search_session = Session()
+    # Get a list of merch objects
+    all_merch_list = search_session.query(Merch).all()
+
+    return all_merch_list
+
+
+def event_list():
+    '''Search Function'''
+    search_session = Session()
+    # Get a list of event objects
+    all_events_list = search_session.query(Event).all()
+
+    return all_events_list
+
+def sales_list():
+
+    '''Search Function'''
+    search_session = Session()
+    # Get a list of event objects
+    all_sales_list = search_session.query(Sale).all()
+
+    return all_events_list
+
+def show_all():
+    '''Search Function'''
+    search_session = Session()
+    # Get a list of event objects
+    all_objects_list = search_session.query(ObType).all()
+
+    return all_objects_list
+
+def add_object_to_db(ObjectType,*args):
+    #Ask the session to instantiate a session object
+    #Use the session object to talk to DB
+    save_session = Session()
+    args = []
+
+    #convert arguments into list
+    for arg in args:
+        args.append(arg)
+
+    if (ObjectType == 'Merch'):
+
+        merch = Merch(description = args[0], price = args[1])
+        save_session.add(merch)
+        ui.message('Added Merch Item to DB')
+
+    elif (ObjectType == 'Event'):
+
+        event = Event(venue = args[0], month = args[1], day = args[2], year = args[3])
+        save_session.add(event)
+        ui.message('Added Event to DB')
+
+    elif (ObjectType == 'Sale'):
+
+        sale = Sale(merchID = args[0], numSold = args[1], eventID = args[2])
+        save_session.add(sale)
+        ui.message('Added Sale to Records')
+
+
+    save_session.commit()
+    save_session.close()
+
+def sales_by_merchID(id):
+
+    total = 0
+    search_session = Session()
+
+    try:
+        merch = search_session.query(Merch).filter_by(id = id).one()
+        break
+    except exc.SQLAlchemyError #loops until valid input
+        id = input('Please enter a valid ID#: ')
+
+    #get all instances of sales that have received id as attribute
+    merchSales = search_session.query(Sale).filter_by(merchID = merch.id).all()
+
+    for sale in merchSales:
+        total += sale.numSold * merch.price
+
+    print('Total sales for '+merch.description+': $'+str(round(total,2)))
+    search_session.close()
+
+
+def sales_by_eventID(id):
+
+    total = 0
+    search_session = Session()
+
+    try:
+        event = search_session.query(Event).filter_by(id = id).one()
+        break
+    except exc.SQLAlchemyError #loops until valid input
+        id = input('Please enter a valid ID#: ')
+
+    #get all instances of sales that have received id as attribute
+    eventSales = search_session.query(Sale).filter_by(eventID = event.id).all()
+
+    for sale in eventSales:
+        merch = search_session.query(Merch).filter_by(id = sale.id).one()
+        total += sale.numSold * merch.price
+
+    print('Total sales at '+event.venue+': $'+str(round(total,2)))
+    search_session.close()
+
+# #Fetch everything
+# #Query returns a query object, which can be looped over - producting Merch objects
+#
+# for merch in search_session.query(Merch):
+#     print(merch)
+#
+#
+# #Fetch first merch item in the results -- this returns a Merch object
+# print(search_session.query(Merch).first())
+#
+# # Filter - all merch objects with price greater than 10
+# results = search_session.query(Merch).filter(Merch.price > 10).all()
+#
+# '''More filtering'''
+# #Match merch where price is greater than 10, order by description
+#
+# for merch in search_session.query(Merch).filter(Merch.price > 10).order_by(Merch.description):
+#     print(merch)
